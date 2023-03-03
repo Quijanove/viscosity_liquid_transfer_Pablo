@@ -24,6 +24,8 @@ version 2: add blow out rate
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+from datetime import datetime
 plt.style.use('ggplot')
 
 import sklearn
@@ -37,7 +39,7 @@ from skopt.utils import use_named_args
 from skopt.learning import GaussianProcessRegressor
 from skopt.learning.gaussian_process.kernels import Matern, ConstantKernel
 
-class Squirt:
+class Dispense:
     
     df = None # prior's dataset
     features = None
@@ -187,8 +189,20 @@ class Squirt:
 
  
 #%%
-file_name = 'practice_data.csv'
+
+file_name = 'Viscosity_std_398.csv'
 df = pd.read_csv(file_name)
+
+training_set_list = ['full', 'half','4','1']
+training_set = training_set_list[0]
+
+
+if training_set == 'half':
+    df = df.iloc[:int(df.shape[0]/2+1)]
+elif training_set == '4':
+    df = df.iloc[:int(df.shape[0]/4+1)]
+elif training_set == '1':
+    df = df.iloc[:1]
 
 
 features = ['volume',
@@ -199,30 +213,75 @@ target='%error'
 
 # %%
 
-liq = Squirt()
-liq.name = 'Not-unknown'
-liq.density = 0.8466
-liq.features = features
-liq.df = df
-liq.target = target
 
-liq.calibrate() ## input volume, when blank it will chose a value between 100 - 1000 uL, 
+liq = Dispense()
+liq.name = 'Viscosity_std_398.4'
+liq.density = 0.86720
+
+liq.df = df
+
+liq.asp_max = df['aspiration_rate'][0] * 1.5 
+liq.asp_min = df['aspiration_rate'][0] * 0.2
+liq.dsp_max = df['dispense_rate'][0] * 1.5 
+liq.dsp_min = df['dispense_rate'][0] * 0.2
+liq.blowout_rate_max = liq.asp_max
+liq.blowout_rate_min = 0
+
+liq.asp_delay_max = 15 
+liq.asp_delay_min = 0
+liq.dsp_delay_max = 15 
+liq.dsp_delay_min = 0
+liq.blowout_delay_max = 15
+liq.blowout_delay_min = 0
+
+
+liq.features = features
+liq.target = target
+liq.model = 'lin'
+
+#%%
+folder = './Opentrons'
+model = 'gpr'
+today = datetime.today().strftime("%Y-%m-%d")
+subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
+if liq.name.split('.')[0] not in subfolders:
+    os.mkdir(folder+'/'+liq.name.split('.')[0])
+    os.mkdir(folder+'/'+liq.name.split('.')[0]+'/lin')
+    os.mkdir(folder+'/'+liq.name.split('.')[0]+'/lin/df2')
+    os.mkdir(folder+'/'+liq.name.split('.')[0]+'/gpr')
+    os.mkdir(folder+'/'+liq.name.split('.')[0]+'/gpr/df2')
+counter =1 
+
+
+#%%
+
+
+#%%
+liq.df = df
+liq.calibrate(1000) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
 
 df = df.append(liq.out_df2.iloc[0,0:-2],ignore_index=True)
-df.iloc[-1,0:5] = df.iloc[0,0:4]
+df.iloc[-1,0:5] = df.iloc[0,0:5]
 df.loc[:,'touch_tip_aspirate'].iloc[-1] = df.loc[:,'touch_tip_aspirate'].iloc[0]
 df.loc[:,'touch_tip_dispense'].iloc[-1] = df.loc[:,'touch_tip_dispense'].iloc[0]
 df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
-#%%
-df['m_measured'].iloc[-1]=  1
 
-df['time'].iloc[-1]=  1 
+counter +=1 
+liq.out_df2.to_csv((folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+datetime.today().strftime("%Y-%m-%d")+'.csv', index = False+'_'+str(counter)),index = False)
+
+#%%
+df['m_measured'].iloc[-1]=   0.7819     
+
+df['time'].iloc[-1]= 57.9076
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
+df
 #%%
 
 df = pd.read_csv('current_experiment.csv')
 
 #%%
+df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+today+'.csv', index = False)
 
+# %%
