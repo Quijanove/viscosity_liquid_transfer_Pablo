@@ -1,8 +1,9 @@
+#%%
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb  7 13:30:22 2023
 
-@author: riko i made
+@author: riko i made and Quijanove
 
 The following script will try to suggest the optimize parameters to reach 
 desired transfer mass
@@ -26,6 +27,9 @@ version 3:
         
 version 3a:
     - without blowout
+
+It loads a dataframe to input the experimental measure error of the suggested parameters, and allows for iteration of the experimental calibration
+of  a target liquid. 
 """
 #%%
 script_ver = 'version 3a: without blowout'
@@ -33,12 +37,12 @@ script_ver = 'version 3a: without blowout'
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
+from datetime import date
+%matplotlib qt
 
 import sklearn
-#from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
-#from sklearn.model_selection import train_test_split, LeaveOneOut
+
 
 from skopt import gp_minimize
 from skopt.space import Real, Categorical
@@ -203,25 +207,38 @@ class Dispense:
             
     
     
-    def transfer(self, mass):
-        '''
-        function to use to transfer liquid in production
-        input mass required
-        
-        return: asp_rate, disp_rate
-        '''
-        pass
-    
-    
-#%%
- 
-file_name = 'practice_data.csv'
-df = pd.read_csv(file_name)
 
+# %%
+
+
+liq = Dispense()
+
+#Please enter name, density, csv with calibration data for training and model name
+liq.name = 'Viscosity_std_398.4'
+liq.density = 0.8672
+file_name = 'Std_calibrations/Viscosity_std_398.csv'
+model = 'gpr'
 training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[0]
+features_list = ['wo_bo', 'wbo']
+feature_selection = features_list[0]
 
 
+
+#Dont change 
+df = pd.read_csv(file_name)
+df['blow_out_state'] = np.zeros(df['blow_out_rate'].shape)
+df['blow_out_state']= df['blow_out_state'].where(df['blow_out_rate']>0).fillna(0)
+df['blow_out_state']= df['blow_out_state'].where(df['blow_out_rate']==0).fillna(1)
+features = [['volume','aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense'],['volume','aspiration_rate', 'dispense_rate', 'blow_out_rate',  'delay_aspirate', 'delay_dispense','delay_blow_out']]
+target='%error'
+
+if feature_selection == 'wo_bo':
+    liq.features = features[0]
+else:
+    liq.features = features[1]
+
+liq.target = target
 if training_set == 'full':
     df = df.iloc[:int(df.shape[0]/2+1)]
 elif training_set == '4':
@@ -230,43 +247,27 @@ elif training_set == '1':
     df = df.iloc[:1]
 
 
-features = ['volume',
-'aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense']
-
-target='%error'
-
-# %%
-
-
-liq = Dispense()
-liq.name = 'Viscosity_std_398.4'
-liq.density = 0.86720
-
-liq.df = df
-
-liq.asp_max = df['aspiration_rate'][0] * 1.5 
+#No need to change
+liq.asp_max = df['aspiration_rate'][0] * 1.2 
 liq.asp_min = df['aspiration_rate'][0] * 0.2
-liq.dsp_max = df['dispense_rate'][0] * 1.5 
-liq.dsp_min = df['dispense_rate'][0] * 0.2
+liq.dsp_max = df['dispense_rate'][0] * 1.2 
+liq.dsp_min = df['dispense_rate'][0] * 0.1
 liq.blowout_rate_max = liq.asp_max
 liq.blowout_rate_min = 0
 
-liq.asp_delay_max = 15 
+liq.asp_delay_max = 6 
 liq.asp_delay_min = 0
-liq.dsp_delay_max = 15 
+liq.dsp_delay_max = 6 
 liq.dsp_delay_min = 0
-liq.blowout_delay_max = 15
+liq.blowout_delay_max = 6
 liq.blowout_delay_min = 0
 
 
-liq.features = features
-liq.target = target
-liq.model = 'lin'
+
 
 #%%
-folder = './Opentrons'
-model = 'gpr'
-today = datetime.today().strftime("%Y-%m-%d")
+folder = './Opentrons_experiments'
+today = date.today().strftime("%Y-%m-%d")
 subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
 if liq.name.split('.')[0] not in subfolders:
     os.mkdir(folder+'/'+liq.name.split('.')[0])
@@ -277,10 +278,8 @@ if liq.name.split('.')[0] not in subfolders:
 counter =1 
 
 
-#%%
 
-
-#%%
+#%%Run for each iteration do not change
 liq.df = df
 liq.calibrate(1000) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
 
@@ -288,26 +287,26 @@ df = df.append(liq.out_df2.iloc[0,0:-2],ignore_index=True)
 df.iloc[-1,0:5] = df.iloc[0,0:5]
 df.loc[:,'touch_tip_aspirate'].iloc[-1] = df.loc[:,'touch_tip_aspirate'].iloc[0]
 df.loc[:,'touch_tip_dispense'].iloc[-1] = df.loc[:,'touch_tip_dispense'].iloc[0]
-df.loc[:,'blowout_state'].iloc[-1] = 1
+df.loc[:,'blow_out_state'].iloc[-1] = 1
 df.loc[:,'blow_out_rate'].iloc[-1] =0
 df.loc[:,'delay_blow_out'].iloc[-1] =0
 
 df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
-# counter +=1 
-# liq.out_df2.to_csv((folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+datetime.today().strftime("%Y-%m-%d")+'.csv', index = False+'_'+str(counter)),index = False)
+counter +=1 
+liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]=   0.7819     
+df['m_measured'].iloc[-1]= 0.8631       
 
-df['time'].iloc[-1]= 57.9076
+df['time'].iloc[-1]= 46.951
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
 df
-#%%
+
 
 df = pd.read_csv('current_experiment.csv')
 
 #%%
-df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+today+'.csv', index = False)
+df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+feature_selection+'_'+today+'.csv', index = False)
