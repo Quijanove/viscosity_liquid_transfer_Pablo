@@ -136,7 +136,7 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()/(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
+            out = pred.item()*(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             
             return out #pred.item()
@@ -310,3 +310,5 @@ df = pd.read_csv('current_experiment.csv')
 
 #%%
 df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+feature_selection+'_'+today+'.csv', index = False)
+
+# %%
