@@ -8,8 +8,12 @@ robots.
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import os 
+import os #os is a package that let's you get paths of files in different folders 
 #%%
+# This cell will load into a dictioanry all the csv files containing the transfer data 
+# from the files generated in the Opentron's jupyter notebook and in the visc_vx_measurement.py
+# given a specific viscous liquid name and a model
+
 liquid_name = 'Viscosity_std_398'
 model = 'gpr'
 viscous_liquid_folder = r'Opentrons_experiments/'+liquid_name + '/' + model  
@@ -26,13 +30,16 @@ for name in os.listdir(opentrons_record_folder):
     file_dict[liquid_name][name[:-4]]= pd.read_csv(opentrons_record_folder+'/'+name)
 
 
-#%%One file
+#%%
+# Code to plot the %error vs iteration for a pair of Opentron's jupyter notebook df and 
+# visc_vx_measurement.py dataframe. The cell plots the data from the orignal 
+# calibraition experiment in a different color from the data generated 
+# by the ML suggestions
 
-name_1 = 'full_2023-03-02'
-name_2 = 'Viscosity_std_398_ML_training_full_gpr'
+name_1 = 'full_2023-03-02' # Name of  csv file from visc_vx_measurement.py 
+name_2 = 'Viscosity_std_398_ML_training_full_gpr' # Name of  Opentron's jupyter notebook
 
-df_man = file_dict[liquid_name][name_1]
-
+df_man = file_dict[liquid_name][name_1] #df_man dataframe that holds the data from original "manual" calibration
 ml_size = file_dict[liquid_name][name_2].shape[0] 
 
 fig,axs = plt.subplots()
@@ -41,7 +48,7 @@ df_man_1000 = df_man[:-ml_size].where(df.volume==1000).dropna()
 df_man_500 = df_man[:-ml_size].where(df.volume==500).dropna()
 df_man_300 = df_man[:-ml_size].where(df.volume==300).dropna()
 
-df_auto_1000 = df_man[-1-ml_size:].where(df.volume==1000).dropna()
+df_auto_1000 = df_man[-1-ml_size:].where(df.volume==1000).dropna() #df_auto dataframe that holds the data suggested by ML program
 df_auto_500 = df_man[-1-ml_size:].where(df.volume==500).dropna()
 df_auto_300 = df_man[-1-ml_size:].where(df.volume==300).dropna()
 
