@@ -37,7 +37,7 @@ script_ver = 'version 3a: without blowout'
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import date
+from datetime import date, datetime
 %matplotlib qt
 
 import sklearn
@@ -136,8 +136,8 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()*(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
-            
+            out = pred.item()/(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
+            #deleted from above: /(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             return out #pred.item()
         
@@ -217,9 +217,9 @@ liq = Dispense()
 liq.name = 'Viscosity_std_398.4'
 liq.density = 0.8672
 file_name = 'Std_calibrations/Viscosity_std_398.csv'
-model = 'gpr'
+model = 'lin'
 training_set_list = ['full', 'half','4','1']
-training_set = training_set_list[0]
+training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
 
@@ -294,12 +294,12 @@ df.loc[:,'delay_blow_out'].iloc[-1] =0
 df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
 counter +=1 
-liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+str(counter)+'.csv', index = False)
+liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.8631       
+df['m_measured'].iloc[-1]= 0.7656                                                                                                                                         
 
-df['time'].iloc[-1]= 46.951
+df['time'].iloc[-1]= 41.4707
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
@@ -309,6 +309,6 @@ df
 df = pd.read_csv('current_experiment.csv')
 
 #%%
-df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+feature_selection+'_'+today+'.csv', index = False)
+df.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+training_set+'_'+feature_selection+'_'+today+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
 
 # %%
