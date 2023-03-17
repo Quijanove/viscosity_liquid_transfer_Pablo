@@ -16,26 +16,31 @@ import os #os is a package that let's you get paths of files in different folder
 
 liquid_name = 'Viscosity_std_398'
 model = 'gpr'
-viscous_liquid_folder = r'Opentrons_experiments/'+liquid_name + '/' + model  
-file_dict  = {}
+version = 'wo_bo'
+data_train = 'full'
 
-for name in os.listdir(viscous_liquid_folder):
-    if os.path.isfile(viscous_liquid_folder+'/'+name) == True:
-        file_dict[liquid_name]= {name[:-4] : pd.read_csv(viscous_liquid_folder+'/'+name)}
+viscous_liquid_cal_folder = '../Std_calibrations'
+viscous_liquid_exp_folder = '../Opentrons_experiments/'+liquid_name + '/Data_collected_from_opentrons' 
+file_dict  = {liquid_name:{}}
 
-opentrons_record_folder = r'Opentrons_experiments/'+liquid_name + '/' +'Data_collected_from_opentrons'
 
-for name in os.listdir(opentrons_record_folder):
-   if model in name:
-    file_dict[liquid_name][name[:-4]]= pd.read_csv(opentrons_record_folder+'/'+name)
+for name in os.listdir(viscous_liquid_cal_folder):
+    if os.path.isfile(viscous_liquid_cal_folder+'/'+name) == True and liquid_name in name:
+        file_dict[liquid_name]['Cal']= {name[:-4] : pd.read_csv(viscous_liquid_cal_folder+'/'+name)}
 
+
+for name in os.listdir(viscous_liquid_exp_folder):
+   if model and version and data_train in name:
+    file_dict[liquid_name]['Experiment'] = {name[:-4]: pd.read_csv(viscous_liquid_exp_folder+'/'+name)}
+ 
+#%%
+for i in 
 
 #%%
 # Code to plot the %error vs iteration for a pair of Opentron's jupyter notebook df and 
 # visc_vx_measurement.py dataframe. The cell plots the data from the orignal 
 # calibraition experiment in a different color from the data generated 
 # by the ML suggestions
-
 name_1 = 'full_2023-03-02' # Name of  csv file from visc_vx_measurement.py 
 name_2 = 'Viscosity_std_398_ML_training_full_gpr' # Name of  Opentron's jupyter notebook
 
