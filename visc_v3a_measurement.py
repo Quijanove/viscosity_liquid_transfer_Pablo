@@ -136,7 +136,7 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()/(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
+            out = pred.item()*(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             #deleted from above: /(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             return out #pred.item()
@@ -297,9 +297,9 @@ counter +=1
 liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.7656                                                                                                                                         
+df['m_measured'].iloc[-1]= 0.8727                                                                                                                                                                
 
-df['time'].iloc[-1]= 41.4707
+df['time'].iloc[-1]= 45.2409
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
