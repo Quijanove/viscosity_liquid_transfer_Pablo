@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os #os is a package that let's you get paths of files in different folders 
+%matplotlib qt
 #%%
 # This cell will load into a dictioanry all the csv files containing the transfer data 
 # from the files generated in the Opentron's jupyter notebook and in the visc_vx_measurement.py
 # given a specific viscous liquid name and a model
 
 liquid_name = 'Viscosity_std_398'
-model = 'gpr'
 version = 'wo_bo'
 data_train = 'full'
 
@@ -28,51 +28,153 @@ for name in os.listdir(viscous_liquid_cal_folder):
     if os.path.isfile(viscous_liquid_cal_folder+'/'+name) == True and liquid_name in name:
         file_dict[liquid_name]['Cal']= {name[:-4] : pd.read_csv(viscous_liquid_cal_folder+'/'+name)}
 
-
+file_dict[liquid_name]['Experiment'] = {}
 for name in os.listdir(viscous_liquid_exp_folder):
-   if model and version and data_train in name:
-    file_dict[liquid_name]['Experiment'] = {name[:-4]: pd.read_csv(viscous_liquid_exp_folder+'/'+name)}
- 
+    if '.csv' in name:
+        if version in name and data_train in name:
+            file_dict[liquid_name]['Experiment'].update({name[:-4]: pd.read_csv(viscous_liquid_exp_folder+'/'+name)})
+    
 #%%
-for i in 
+if data_train == 'full':
+        
+    for experiment in file_dict[liquid_name]['Experiment']:
+            
+        if 'lin' in experiment:
+            model = 'Linear Regression'
+        elif 'gpr' in experiment:
+            model = 'Gaussian Process Regression'
+        
+        if 'without' in experiment:
+            penalization = 'without'
 
-#%%
-# Code to plot the %error vs iteration for a pair of Opentron's jupyter notebook df and 
-# visc_vx_measurement.py dataframe. The cell plots the data from the orignal 
-# calibraition experiment in a different color from the data generated 
-# by the ML suggestions
-name_1 = 'full_2023-03-02' # Name of  csv file from visc_vx_measurement.py 
-name_2 = 'Viscosity_std_398_ML_training_full_gpr' # Name of  Opentron's jupyter notebook
+        elif 'multiply' in experiment:
+            penalization = 'with slow'
 
-df_man = file_dict[liquid_name][name_1] #df_man dataframe that holds the data from original "manual" calibration
-ml_size = file_dict[liquid_name][name_2].shape[0] 
+        elif 'divide' in experiment:
+            penalization = 'with fast'
 
-fig,axs = plt.subplots()
+        df_experiment = file_dict[liquid_name]['Experiment'][experiment]
+        fig,axs = plt.subplots(2,1)
 
-df_man_1000 = df_man[:-ml_size].where(df.volume==1000).dropna()
-df_man_500 = df_man[:-ml_size].where(df.volume==500).dropna()
-df_man_300 = df_man[:-ml_size].where(df.volume==300).dropna()
+        df_cal_1000 = df_cal.where(df_cal.volume==1000).dropna(how='all')
+        df_cal_500 = df_cal.where(df_cal.volume==500).dropna(how='all')
+        df_cal_300 = df_cal.where(df_cal.volume==300).dropna(how='all')
 
-df_auto_1000 = df_man[-1-ml_size:].where(df.volume==1000).dropna() #df_auto dataframe that holds the data suggested by ML program
-df_auto_500 = df_man[-1-ml_size:].where(df.volume==500).dropna()
-df_auto_300 = df_man[-1-ml_size:].where(df.volume==300).dropna()
+        df_auto_1000 = df_experiment.where(df_experiment.volume==1000).dropna(how='all') #df_auto dataframe that holds the data suggested by ML program
+        df_auto_500 = df_experiment.where(df_experiment.volume==500).dropna(how='all')
+        df_auto_300 = df_experiment.where(df_experiment.volume==300).dropna(how='all')
 
-axs.scatter(df_man_1000.index.to_series()+1,df_man_1000['%error'], marker= 'x', label = '1000', c = 'red')
-axs.scatter(df_man_500.index.to_series()+1,df_man_500['%error'], marker= 'x', label = '500', c = 'green')
-axs.scatter(df_man_300.index.to_series()+1,df_man_300['%error'], marker= 'x', label = '300', c = 'grey')
-axs.plot(df_man[:-ml_size].index.to_series()+1, df_man['%error'][:-ml_size],label = 'Manual' )
+        axs[0].scatter(df_cal_1000.index.to_series()+1,df_cal_1000['%error'], marker= 'x', label = '1000', c = 'red')
+        axs[0].scatter(df_cal_500.index.to_series()+1,df_cal_500['%error'], marker= 'x', label = '500', c = 'green')
+        axs[0].scatter(df_cal_300.index.to_series()+1,df_cal_300['%error'], marker= 'x', label = '300', c = 'grey')
+        axs[0].plot(df_cal.index.to_series()+1, df_cal['%error'],label = 'Human driven' )
 
-axs.scatter(df_auto_1000.index.to_series()+1,df_auto_1000['%error'], marker= 'x', c = 'red')
-axs.scatter(df_auto_500.index.to_series()+1,df_auto_500['%error'], marker= 'x', c = 'green')
-axs.scatter(df_auto_300.index.to_series()+1,df_auto_300['%error'], marker= 'x',  c = 'grey')
-axs.plot(df_man[-1-ml_size:].index.to_series()+1, df_man['%error'][-1-ml_size:],label = 'Automated' )
+        # axs[0].scatter(df_auto_1000.index.to_series()+df_cal.index.to_series().iloc[-1]+1,df_auto_1000['%error'], marker= 'x', c = 'red')
+        # axs[0].scatter(df_auto_500.index.to_series()+df_cal.index.to_series().iloc[-1]+1,df_auto_500['%error'], marker= 'x', c = 'green')
+        # axs[0].scatter(df_auto_300.index.to_series()+df_cal.index.to_series().iloc[-1]+1,df_auto_300['%error'], marker= 'x',  c = 'grey')
+        # axs[0].plot(df_experiment.index.to_series()+df_cal.index.to_series().iloc[-1]+1, df_experiment['%error'],label = 'Automated' )
+
+        axs[0].scatter(df_auto_1000.index.to_series()+1,df_auto_1000['%error'], marker= 'x', c = 'red')
+        axs[0].scatter(df_auto_500.index.to_series()+1,df_auto_500['%error'], marker= 'x', c = 'green')
+        axs[0].scatter(df_auto_300.index.to_series()+1,df_auto_300['%error'], marker= 'x',  c = 'grey')
+        axs[0].plot(df_experiment.index.to_series()+1, df_experiment['%error'],label = 'ML driven' )
 
 
-axs.set_xlabel('Iteration')
-axs.set_ylabel('Error [%]')
-axs.legend()
+        # axs[0].plot([df_cal.index.to_series().iloc[-1]+1]*2,  np.append(df_cal['%error'].iloc[-1],df_experiment['%error'].iloc[0]))
+
+
+
+        axs[0].set_xlabel('Iteration')
+        axs[0].set_ylabel('Error [%]')
+
+    
+        axs[1].scatter(df_cal_1000.index.to_series()+1,df_cal_1000['time'], marker= 'x', c = 'red')
+        # axs[1].scatter(df_cal_500.index.to_series()+1,df_cal_500['time']*1.3, marker= 'x', c = 'green')
+        # axs[1].scatter(df_cal_300.index.to_series()+1,df_cal_300['time']*1.3*1.14, marker= 'x', c = 'gray')
+        axs[1].plot(df_cal_1000.index.to_series()+1,df_cal_1000['time'])
+        # axs[1].plot(df_cal_500.index.to_series()+1,df_cal_500['time']*1.3,color ='#1f77b4')
+        # axs[1].plot(df_cal_300.index.to_series()+1,df_cal_300['time']*1.3*1.14,color ='#1f77b4')
+
+        axs[1].scatter(df_experiment.index.to_series()+1,df_experiment['time'],marker= 'x',c='red')
+        axs[1].plot(df_experiment.index.to_series()+1,df_experiment['time'] )
+
+        axs[1].set_xlabel('Iteration')
+        axs[1].set_ylabel('Time')      
+
+        fig.suptitle('{} model {} transfer penalization, trained with {} data set'.format(model,penalization,data_train))
+        fig.legend(loc=7)
+        fig.tight_layout()
+        fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
 
 
 
 # %%
+#%%
+if data_train = '1':
+        
 
+    for experiment in file_dict[liquid_name]['Experiment']:
+
+        if 'lin' in experiment:
+            model = 'Linear Regression'
+        elif 'gpr' in experiment:
+            model = 'Gaussian Process Regression'
+        
+        if 'without' in experiment:
+            penalization = 'without'
+
+        elif 'multiply' in experiment:
+            penalization = 'with slow'
+
+        elif 'divide' in experiment:
+            penalization = 'with fast'
+
+        df_experiment = file_dict[liquid_name]['Experiment'][experiment]
+        fig,axs = plt.subplots(2,1)
+
+        df_cal_1000 = df_cal.where(df_cal.volume==1000).dropna(how='all')
+        df_cal_500 = df_cal.where(df_cal.volume==500).dropna(how='all')
+        df_cal_300 = df_cal.where(df_cal.volume==300).dropna(how='all')
+
+        df_auto_1000 = df_experiment.where(df_experiment.volume==1000).dropna(how='all') #df_auto dataframe that holds the data suggested by ML program
+        df_auto_500 = df_experiment.where(df_experiment.volume==500).dropna(how='all')
+        df_auto_300 = df_experiment.where(df_experiment.volume==300).dropna(how='all')
+
+        axs[0].scatter(df_cal_1000.index.to_series()+1,df_cal_1000['%error'], marker= 'x', label = '1000', c = 'red')
+        axs[0].scatter(df_cal_500.index.to_series()+1,df_cal_500['%error'], marker= 'x', label = '500', c = 'green')
+        axs[0].scatter(df_cal_300.index.to_series()+1,df_cal_300['%error'], marker= 'x', label = '300', c = 'grey')
+        axs[0].plot(df_cal.index.to_series()+1, df_cal['%error'],label = 'Manual' )
+
+        axs[0].scatter(df_auto_1000.index.to_series()+2,df_auto_1000['%error'], marker= 'x', c = 'red')
+        axs[0].scatter(df_auto_500.index.to_series()+2,df_auto_500['%error'], marker= 'x', c = 'green')
+        axs[0].scatter(df_auto_300.index.to_series()+2,df_auto_300['%error'], marker= 'x',  c = 'grey')
+        axs[0].plot(df_experiment.index.to_series()+2, df_experiment['%error'],label = 'Automated' )
+        axs[0].plot(df_cal.index.to_series().iloc[0:2]+1,  np.append(df_cal['%error'].iloc[0],df_experiment['%error'].iloc[0]),color = '#ff7f0e')
+
+
+
+
+        axs[0].set_xlabel('Iteration')
+        axs[0].set_ylabel('Error [%]')
+        # axs[0].legend(loc='lower right')
+
+    
+        axs[1].scatter(df_cal_1000.index.to_series()+1,df_cal_1000['time'], marker= 'x', c = 'red')
+        axs[1].plot(df_cal_1000.index.to_series()+1,df_cal_1000['time'])
+
+        axs[1].scatter(df_experiment.index.to_series()+2,df_experiment['time'],marker= 'x',c='red')
+        axs[1].plot(df_experiment.index.to_series()+2,df_experiment['time'] )
+        axs[1].plot(df_cal.index.to_series().iloc[0:2]+1,  np.append(df_cal['time'].iloc[0],df_experiment['time'].iloc[0]),color = '#ff7f0e')
+
+
+        axs[1].set_xlabel('Iteration')
+        axs[1].set_ylabel('Time')
+        # axs[1].legend(loc='lower right')
+        
+
+        fig.suptitle('{} model {} transfer penalization, trained with {} data set'.format(model,penalization,data_train))
+        fig.legend(loc=7)
+        fig.tight_layout()
+        fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
+
+# %%
