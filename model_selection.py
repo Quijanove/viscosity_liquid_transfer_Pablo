@@ -513,7 +513,7 @@ df_out.to_csv('model_parameters_2.csv')
 def analyze_list_databse(dir_name,grid_search,model_name,i=None):
     score_df = pd.DataFrame()
 
-    for file_name in [os.listdir(dir_name)[0]]:
+    for file_name in os.listdir(dir_name):
         file_dict = {}    
         df = pd.read_csv(dir_name+file_name)
         df_scaled = df.copy()
@@ -534,11 +534,12 @@ def analyze_list_databse(dir_name,grid_search,model_name,i=None):
     min_index = score_df['overall_test_score'].idxmin()
     df_score_out = score_df.loc[min_index,['overall_test_score','overall_std_test_score']]
     df_score_out['params'] =grid_search.cv_results_['params'][min_index]
-    if i != None:
+    if i == None:
         df_score_out.name = model_name
     else:
-        df_score_out.name = model_name +'_'+i 
+        df_score_out.name = model_name+'_'+ str(i) 
     return df_score_out
+
 
 
 
