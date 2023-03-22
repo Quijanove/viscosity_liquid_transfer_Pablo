@@ -175,8 +175,8 @@ class Dispense:
         
         self.out_df2 = self.out_df.iloc[:5,:].copy()
         
-        self.out_df2.sort_values(by='oo', ascending=True, inplace=True) ## sort based on time
-        self.out_df2.reset_index(inplace=True, drop=True)
+        # self.out_df2.sort_values(by='oo', ascending=True, inplace=True) ## sort based on time
+        # self.out_df2.reset_index(inplace=True, drop=True)
         
         
         print(f'\n {script_ver}\n Next Run:')
@@ -214,12 +214,12 @@ class Dispense:
 liq = Dispense()
 
 #Please enter name, density, csv with calibration data for training and model name
-liq.name = 'Viscosity_std_1275'
-liq.density = 0.8736
-file_name = 'Std_calibrations/Viscosity_std_1275.csv'
+liq.name = 'Viscosity_std_398'
+liq.density = 0.8672
+file_name = 'Std_calibrations/{}.csv'.format(liq.name)
 model = 'lin'
 training_set_list = ['full', 'half','4','1']
-training_set = training_set_list[0]
+training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
 
@@ -288,8 +288,8 @@ df.iloc[-1,0:5] = df.iloc[0,0:5]
 df.loc[:,'touch_tip_aspirate'].iloc[-1] = df.loc[:,'touch_tip_aspirate'].iloc[0]
 df.loc[:,'touch_tip_dispense'].iloc[-1] = df.loc[:,'touch_tip_dispense'].iloc[0]
 df.loc[:,'blow_out_state'].iloc[-1] = 1
-df.loc[:,'blow_out_rate'].iloc[-1] =0
-df.loc[:,'delay_blow_out'].iloc[-1] =0
+df.loc[:,'blow_out_rate'].iloc[-1] = 0
+df.loc[:,'delay_blow_out'].iloc[-1] = 0
 
 df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
@@ -297,9 +297,9 @@ counter +=1
 liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.801                                                                                                                                                                                          
+df['m_measured'].iloc[-1]= 0.8548         
 
-df['time'].iloc[-1]= 226.1457
+df['time'].iloc[-1]= 63.0953
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
