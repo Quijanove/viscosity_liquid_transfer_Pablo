@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os #os is a package that let's you get paths of files in different folders 
-%matplotlib qt
+# %matplotlib qt
 #%%
 # This cell will load into a dictioanry all the csv files containing the transfer data 
 # from the files generated in the Opentron's jupyter notebook and in the visc_vx_measurement.py
@@ -25,7 +25,7 @@ file_dict  = {liquid_name:{}}
 
 
 for name in os.listdir(viscous_liquid_cal_folder):
-    if os.path.isfile(viscous_liquid_cal_folder+'/'+name) == True and liquid_name in name:
+    if  liquid_name in name:
         file_dict[liquid_name]['Cal']= {name[:-4] : pd.read_csv(viscous_liquid_cal_folder+'/'+name)}
 
 file_dict[liquid_name]['Experiment'] = {}
@@ -47,7 +47,7 @@ if data_train == 'full':
         elif 'gpr' in experiment:
             model = 'Gaussian Process Regression'
         
-        if 'without' in experiment:
+        if 'none' in experiment:
             penalization = 'no'
 
         elif 'multiply' in experiment:
@@ -109,7 +109,7 @@ if data_train == '1':
         elif 'gpr' in experiment:
             model = 'Gaussian Process Regression'
         
-        if 'without' in experiment:
+        if 'none' in experiment:
             penalization = 'no'
 
         elif 'multiply' in experiment:
