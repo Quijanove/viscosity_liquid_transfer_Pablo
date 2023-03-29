@@ -110,7 +110,7 @@ class Dispense:
         self.space = [Categorical(volume, name='volume'),
                       
                       Real(self.asp_min, self.asp_max, name='aspiration_rate'),
-                      Real(self.dsp_min, self.asp_max, name='dispense_rate'),
+                      Real(self.dsp_min, self.dsp_max, name='dispense_rate'),
                       Real(self.asp_delay_min, self.asp_delay_max, name='delay_aspirate'),
                       Real(self.dsp_delay_min, self.dsp_delay_max, name='delay_dispense'),
                       # Categorical([0, 1], name='blowout_state'),
@@ -148,7 +148,7 @@ class Dispense:
                           self.space, 
                           n_calls=60, 
                           kappa = 1.0, # default 1.95 balanced between exploitation vs exploration
-                          acq_func = 'EI',
+                          acq_func = 'EI' #LCB
                           #x0 = x0,
                           #y0 = y0, 
                           random_state=123
@@ -239,7 +239,7 @@ else:
     liq.features = features[1]
 
 liq.target = target
-if training_set == 'full':
+if training_set == 'half':
     df = df.iloc[:int(df.shape[0]/2+1)]
 elif training_set == '4':
     df = df.iloc[:int(df.shape[0]/4+1)]
