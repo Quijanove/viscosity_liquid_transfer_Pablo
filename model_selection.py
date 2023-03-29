@@ -78,7 +78,27 @@ def analyze_predictions_list_database(model, dir_name,model_name,i=None):
                 all_predictions_df.to_csv('Model_analysis/'+model_name+'.csv')
     return all_predictions_df
 
-#%
+def analyze_predictions(model, data, features, target):
+    scaler = StandardScaler()
+    df_scaled = data.copy()
+    df_scaled = df_scaled.sample(frac=1,random_state=42)
+
+    df_scaled[features] = scaler.fit_transform(df_scaled[features])
+
+    X = df_scaled[features]
+    y = df_scaled[target]
+
+    for train_index, test_index in loo.split(X):
+        model.fit(X.iloc[train_index], y.iloc[train_index])
+        prediction  = model.predict(X.iloc[test_index])
+        prediction_df = pd.DataFrame({'experimental':y.iloc[test_index],'prediction':prediction})
+        all_predictions_df = pd.concat([all_predictions_df,prediction_df], ignore_index= True)
+    if i != None:
+        all_predictions_df.to_csv('Model_analysis/'+model_name+'_'+i+'.csv')
+    else:
+        all_predictions_df.to_csv('Model_analysis/'+model_name+'.csv')
+    return all_predictions_df
+
 #%%Import csv files that will be analyzed and plot relationships between error and liquid handling parameters
 dir_name = r'Std_calibrations/'
 features = ['aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense', 'blow_out_rate', 'delay_blow_out']  
@@ -90,15 +110,17 @@ for file_name in os.listdir(dir_name):
     plot = sns.pairplot(data=df, x_vars=features, y_vars = target, hue = 'volume', palette = 'muted')
     plot.fig.subplots_adjust(top=0.9)
     plot.fig.suptitle(file_name[:-4])
-#%%
+#%%#%%Import csv files that will be analyzed and plot relationships between error and liquid handling parameters
+
 dir_name = r'Summaries/'
-features = ['aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense', 'blow_out_rate', 'delay_blow_out']  
-target='Viscosity'
+features = ['time','aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense', 'blow_out_rate', 'delay_blow_out']  
+target='Viscosity 10 s-1'
 
-transfer_parameters_df = pd.read_csv('Transfer_Parameters_Summary.csv')
+transfer_parameters_df = pd.read_csv(dir_name+'Transfer_Parameters_Summary.csv')
 
-plot =  sns.pairplot(data=transfer_parameters_df, x_vars=features, y_vars = target, hue = 'volume', palette = 'muted')
-
+plot =  sns.pairplot(data=transfer_parameters_df, x_vars=features, y_vars = target, palette = 'muted')
+plot.fig.subplots_adjust(top=0.9)
+plot.fig.suptitle('Viscosity vs Best transfer parameters')
 
 
 # %% 
@@ -119,7 +141,7 @@ target='%error'
 
 model_list =['lin','gpr','poly', 'SVR', 'SGD','KNR','DTR','KR','PLSR','RFR']
 loo = LeaveOneOut()
-scaler = StandardScaler()
+
 
 df_out= pd.DataFrame()
 
@@ -291,7 +313,7 @@ df_out.to_csv('model_parameters_2.csv')
 parameter_sumamry = pd.read_csv('model_parameters_2.csv')
 # %% 
 # Following code returns a dict containing the predictions of error given the set of liquid handling 
-# parameters for eahc visocisty standard obtained experimentally. 
+# parameters for each visocisty standard obtained experimentally. 
 # The predicted values are obtained using various regression models and the optimized parameters
 # for each model obtained using the code above.
 # The returned dictioanry contains both the experimental measured values of error and the values
@@ -392,16 +414,21 @@ for model_name in model_list:
 #%% Plot the precited vs experimental errors obtained in code above
 parameter_sumamry = pd.read_csv('model_parameters_2.csv')
 
-for i in all_predictions_dict:
-    fig,axs = plt.subplots()
-    axs.scatter(all_predictions_dict[i]['experimental'],all_predictions_dict[i]['prediction'])
-    min = all_predictions_dict[i]['experimental'].min()
-    max = all_predictions_dict[i]['experimental'].max()
-    one_2_one = np.linspace(min,max,1000)
-    axs.plot(one_2_one,one_2_one,color='black')
-    axs.set_xlabel('Experimental error [%]')
-    axs.set_ylabel('Predicted error [%]')
-    fig.suptitle('Model {} performance chart, MAE :  {}'.format(i,round(float(parameter_sumamry.loc[0,i]),2)))
-    fig.savefig('Model_analysis/'+i+'_performance.png')
+for file in os.listdir('Model_analysis/'):
+    if 'csv' in file:
+        df = pd.read_csv('Model_analysis/'+file).drop('Unnamed: 0',axis=1)
+        y_pred = df['prediction']
+        y_test = df['experimental']
+        fig,axs = plt.subplots()
+        axs.scatter(y_pred,y_test)
+        min = df.min().min()
+        max = df.max().max()
+        one_2_one = np.linspace(min,max,1000)
+        axs.plot(one_2_one,one_2_one,color='black')
+        axs.set_xlabel('Experimental error [%]')
+        axs.set_ylabel('Predicted error [%]')
+        fig.suptitle('Model {} performance chart, MAE :  {}'.format(file[:-4],round(float(parameter_sumamry.loc[0,file[:-4]]),2)))
+        fig.savefig('Model_analysis/'+file[:-4]+'_performance.png')
 
 
+#%%
