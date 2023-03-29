@@ -17,7 +17,7 @@ import os #os is a package that let's you get paths of files in different folder
 
 liquid_name = 'Viscosity_std_1275'
 version = 'wo_bo'
-data_train = '1'
+data_train = 'full'
 
 viscous_liquid_cal_folder = '../Std_calibrations'
 viscous_liquid_exp_folder = '../Opentrons_experiments/'+liquid_name + '/Data_collected_from_opentrons' 
@@ -29,6 +29,7 @@ for name in os.listdir(viscous_liquid_cal_folder):
         file_dict[liquid_name]['Cal']= {name[:-4] : pd.read_csv(viscous_liquid_cal_folder+'/'+name)}
 
 file_dict[liquid_name]['Experiment'] = {}
+
 for name in os.listdir(viscous_liquid_exp_folder):
     if '.csv' in name:
         if version in name and data_train in name.split('training')[1]:
@@ -44,6 +45,7 @@ if data_train == 'full':
     
         if 'lin' in experiment:
             model = 'Linear Regression'
+
         elif 'gpr' in experiment:
             model = 'Gaussian Process Regression'
         
@@ -55,6 +57,11 @@ if data_train == 'full':
 
         elif 'divide' in experiment:
             penalization = 'fast transfer'
+
+        if 'unordered' in experiment:
+            order = 'unorder'
+        else:
+            order = 'ordered'
 
         df_experiment = file_dict[liquid_name]['Experiment'][experiment]
         fig,axs = plt.subplots(2,1)
@@ -94,10 +101,10 @@ if data_train == 'full':
         axs[1].set_xlabel('Iteration')
         axs[1].set_ylabel('Time')      
 
-        fig.suptitle('{} model with {}  penalization, \n trained with {} data set'.format(model,penalization,data_train))
+        fig.suptitle('{} model with {}  penalization, \n trained with {} data set and {} by time'.format(model,penalization,data_train,order))
         fig.legend(loc=7)
         fig.tight_layout()
-        fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
+        #fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
 
 
 if data_train == '1':       
@@ -106,6 +113,7 @@ if data_train == '1':
 
         if 'lin' in experiment:
             model = 'Linear Regression'
+
         elif 'gpr' in experiment:
             model = 'Gaussian Process Regression'
         
@@ -117,6 +125,11 @@ if data_train == '1':
 
         elif 'divide' in experiment:
             penalization = 'fast transfer'
+
+        if 'unordered' in experiment:
+            order = 'unorder'
+        else:
+            order = 'ordered'
 
         df_experiment = file_dict[liquid_name]['Experiment'][experiment]
         fig,axs = plt.subplots(2,1)
@@ -161,9 +174,9 @@ if data_train == '1':
         # axs[1].legend(loc='lower right')
         
 
-        fig.suptitle('{} model with {}  penalization, \n trained with {} initialization data'.format(model,penalization,data_train))
+        fig.suptitle('{} model with {}  penalization, \n trained with {} initialization data and {} by time'.format(model,penalization,data_train,order))
         fig.legend(loc=7)
         fig.tight_layout()
-        fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
+        #fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
 
 # %%

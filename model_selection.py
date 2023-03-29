@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import os
+
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
@@ -13,11 +14,17 @@ import sklearn.linear_model as linear_model
 from sklearn.model_selection import cross_validate
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_absolute_error
+from sklearn import decomposition
+
 from skopt.learning import GaussianProcessRegressor
 from skopt.learning.gaussian_process.kernels import Matern, ConstantKernel
-from sklearn.model_selection import GridSearchCV
+
 import seaborn as sns
 from matplotlib import pyplot as plt
+
+
 %matplotlib qt
 
 
@@ -110,6 +117,7 @@ for file_name in os.listdir(dir_name):
     plot = sns.pairplot(data=df, x_vars=features, y_vars = target, hue = 'volume', palette = 'muted')
     plot.fig.subplots_adjust(top=0.9)
     plot.fig.suptitle(file_name[:-4])
+
 #%%#%%Import csv files that will be analyzed and plot relationships between error and liquid handling parameters
 
 dir_name = r'Summaries/'
@@ -132,7 +140,6 @@ plot.fig.suptitle('Viscosity vs Best transfer parameters')
 # is computed for each set of parameters. Finally for each model I record the set of paramters with he
 # smalles MAE into a panda dataframe, which is returned at the end for the code. 
 
- 
 dir_name = r'Std_calibrations/'
 
 
@@ -165,7 +172,7 @@ for model_name in model_list:
         df_out = pd.concat([df_out,analyze_scores_list_database(dir_name,search,model_name)],axis=1)
 
 
-    
+  
     elif model_name == 'poly':
         model = Pipeline([('poly', PolynomialFeatures(degree=2)),
                 ('linear', linear_model.LinearRegression(fit_intercept=False))])          
@@ -304,13 +311,11 @@ for model_name in model_list:
         grid = dict(criterion=criterion)
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_database(dir_name,search,model_name)],axis=1)
+
 df_out.to_csv('model_parameters_2.csv')
 
 
 
-
-# %%
-parameter_sumamry = pd.read_csv('model_parameters_2.csv')
 # %% 
 # Following code returns a dict containing the predictions of error given the set of liquid handling 
 # parameters for each visocisty standard obtained experimentally. 
@@ -431,4 +436,97 @@ for file in os.listdir('Model_analysis/'):
         fig.savefig('Model_analysis/'+file[:-4]+'_performance.png')
 
 
-#%%
+#%% Plot and analyze models trained with data from manual calibration experiments with unseen data  
+# obtained from ML driven experiments
+
+liquid= 'Viscosity_std_398'
+model_list = ['lin','gpr','SVR_poly','SGD_l2-l1']
+
+features = ['aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense', 'blow_out_rate', 'delay_blow_out']  
+target='%error'
+scaler = StandardScaler()
+
+all_398_ML = pd.read_csv('Opentrons_experiments/'+liquid+'/all_measurements.csv')
+df_test = all_398_ML.drop_duplicates(subset=features, keep='first')
+df_test = df_test.sample(7, random_state=42)
+df_train = pd.read_csv('Std_calibrations/'+liquid+'.csv')
+
+for model_name in model_list:
+
+    if model_name == 'lin':
+        model = linear_model.LinearRegression()
+
+
+    elif model_name =='gpr':
+        matern_tunable = ConstantKernel(1.0, (1e-5, 1e6)) * Matern(
+                    length_scale=1.0, length_scale_bounds=(1e-5, 1e6), nu=2.5)
+
+        model = GaussianProcessRegressor(kernel=matern_tunable, 
+                                        n_restarts_optimizer=0, 
+                                        alpha=0.4, 
+                                        normalize_y=True)
+
+    elif model_name == 'SVR_poly':
+        model =  SVR(kernel='poly', C = 11, coef0 = 11, degree = 1, epsilon = 0.4, gamma = 'scale')
+
+
+    elif model_name == 'SGD_l2-l1':
+        model = linear_model.SGDRegressor(random_state=42, alpha=0.0007,learning_rate='invscaling', penalty= 'l1', power_t = 0.25)
+
+    X_train = scaler.fit_transform(df_train[features])
+    y_train = df_train[target]
+    model.fit(X_train,y_train)
+
+    X_test = scaler.transform(df_test[features])
+    y_test = df_test[target]
+
+    y_test_predict = model.predict(X_test)
+    y_train_predict = model.predict(X_train)
+
+    MAE = mean_absolute_error(y_test, y_test_predict)
+    r2 = model.score(X_test,y_test)
+
+
+    min = pd.concat([df_train,df_test])[target].min()
+    max = pd.concat([df_train,df_test])[target].max()
+    one2one = np.linspace(min,max,)
+
+    fig, axs = plt.subplots()  
+    axs.scatter(y_test,y_test_predict, label = 'test')
+    axs.scatter(y_train, y_train_predict, label = 'train')
+    axs.plot (one2one,one2one)
+    axs.legend()
+    axs.set_xlabel('Experimental error [%]')
+    axs.set_ylabel('Predicted error [%]')
+    fig.suptitle('Model {} for {} \n MAE :  {}, r2:{}'.format(model_name,liquid,round(MAE,2), round(r2,2)))
+    fig.savefig('Model_analysis/'+liquid+'_'+model_name+'_unseen_data_performance.png')
+
+
+# %%
+liquid= 'Viscosity_std_398'
+all_398_ML = pd.read_csv('Opentrons_experiments/'+liquid+'/all_measurements.csv')
+df_test = all_398_ML.drop_duplicates(subset=features, keep='first')
+df_test = df_test.sample(7, random_state=42)
+df_train = pd.read_csv('Std_calibrations/'+liquid+'.csv')
+
+df_plot = pd.concat([df_train[features],df_test[features]])
+df_train= pd.DataFrame(decomposition.PCA(3).fit_transform(df_plot[features])).iloc[:-7]
+df_test = pd.DataFrame(decomposition.PCA(3).fit_transform(df_plot[features])).iloc[-7:]
+
+fig= plt.figure()
+ax= fig.add_subplot(projection = '3d')
+ax.scatter(df_train[0],df_train[1],df_train[2], label = 'Train set')
+ax.scatter(df_test[0],df_test[1],df_test[2], label = 'Test set')
+
+ax.set_xlabel('X')
+ax.set_xlim([-20,40],auto= False)
+ax.set_ylabel('Y')
+ax.set_ylim([-5,15],auto= False)
+ax.set_zlabel('Z')
+ax.set_zlim([-2,8],auto= False)
+ax.legend()
+
+fig.suptitle('{} PCA analysis'.format(liquid))
+fig.savefig('Model_analysis/{}_PCA_analysis.png'.format(liquid))
+
+# %%
