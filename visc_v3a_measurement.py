@@ -110,7 +110,7 @@ class Dispense:
         self.space = [Categorical(volume, name='volume'),
                       
                       Real(self.asp_min, self.asp_max, name='aspiration_rate'),
-                      Real(self.dsp_min, self.asp_max, name='dispense_rate'),
+                      Real(self.dsp_min, self.dsp_max, name='dispense_rate'),
                       Real(self.asp_delay_min, self.asp_delay_max, name='delay_aspirate'),
                       Real(self.dsp_delay_min, self.dsp_delay_max, name='delay_dispense'),
                       # Categorical([0, 1], name='blowout_state'),
@@ -148,7 +148,7 @@ class Dispense:
                           self.space, 
                           n_calls=60, 
                           kappa = 1.0, # default 1.95 balanced between exploitation vs exploration
-                          acq_func = 'EI',
+                          acq_func = 'EI' #LCB
                           #x0 = x0,
                           #y0 = y0, 
                           random_state=123
@@ -219,7 +219,7 @@ liq.density = 0.8736
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
 model = 'lin'
 training_set_list = ['full', 'half','4','1']
-training_set = training_set_list[0]
+training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
 
@@ -239,7 +239,7 @@ else:
     liq.features = features[1]
 
 liq.target = target
-if training_set == 'full':
+if training_set == 'half':
     df = df.iloc[:int(df.shape[0]/2+1)]
 elif training_set == '4':
     df = df.iloc[:int(df.shape[0]/4+1)]
@@ -297,9 +297,9 @@ counter +=1
 liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.8694                         
+df['m_measured'].iloc[-1]= 0.7846          
 
-df['time'].iloc[-1]= 413.0368
+df['time'].iloc[-1]= 141.2942
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
