@@ -110,7 +110,7 @@ class Dispense:
         self.space = [Categorical(volume, name='volume'),
                       
                       Real(self.asp_min, self.asp_max, name='aspiration_rate'),
-                      Real(self.dsp_min, self.dsp_max, name='dispense_rate'),
+                      Real(self.dsp_min, self.asp_max, name='dispense_rate'),
                       Real(self.asp_delay_min, self.asp_delay_max, name='delay_aspirate'),
                       Real(self.dsp_delay_min, self.dsp_delay_max, name='delay_dispense'),
                       # Categorical([0, 1], name='blowout_state'),
@@ -146,9 +146,11 @@ class Dispense:
         
         self.res = gp_minimize(obj_func, 
                           self.space, 
-                          n_calls=60, 
-                          kappa = 1.0, # default 1.95 balanced between exploitation vs exploration
-                          acq_func = 'EI' #LCB
+                          n_calls=50, 
+                          #n_initial_points=45,
+                          #xi =0.01,
+                          #kappa = 1.0, # default 1.95 balanc,ed between exploitation vs exploration
+                          acq_func = 'EI',
                           #x0 = x0,
                           #y0 = y0, 
                           random_state=123
@@ -217,12 +219,13 @@ liq = Dispense()
 liq.name = 'Viscosity_std_1275'
 liq.density = 0.8736
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
-model = 'lin'
+model = 'gpr'
 training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
-
+penalization = 'none' #or 'multiply'
+oredr = 'unordered' # or ''
 
 
 #Dont change 
@@ -232,6 +235,7 @@ df['blow_out_state']= df['blow_out_state'].where(df['blow_out_rate']>0).fillna(0
 df['blow_out_state']= df['blow_out_state'].where(df['blow_out_rate']==0).fillna(1)
 features = [['volume','aspiration_rate', 'dispense_rate', 'delay_aspirate', 'delay_dispense'],['volume','aspiration_rate', 'dispense_rate', 'blow_out_rate',  'delay_aspirate', 'delay_dispense','delay_blow_out']]
 target='%error'
+counter =0
 
 if feature_selection == 'wo_bo':
     liq.features = features[0]
@@ -244,7 +248,7 @@ if training_set == 'half':
 elif training_set == '4':
     df = df.iloc[:int(df.shape[0]/4+1)]
 elif training_set == '1':
-    df = df.iloc[:1]
+    df = df.iloc[[0,-1]]
 
 
 #No need to change
@@ -265,7 +269,7 @@ liq.blowout_delay_min = 0
 
 
 
-#%%
+    #%%
 folder = './Opentrons_experiments'
 today = date.today().strftime("%Y-%m-%d")
 subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
@@ -275,11 +279,12 @@ if liq.name.split('.')[0] not in subfolders:
     os.mkdir(folder+'/'+liq.name.split('.')[0]+'/lin/df2')
     os.mkdir(folder+'/'+liq.name.split('.')[0]+'/gpr')
     os.mkdir(folder+'/'+liq.name.split('.')[0]+'/gpr/df2')
-counter =1 
+
 
 
 
 #%%Run for each iteration do not change
+
 liq.df = df
 liq.calibrate(1000) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
 
@@ -294,12 +299,15 @@ df.loc[:,'delay_blow_out'].iloc[-1] = 0
 df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
 counter +=1 
-liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+'df2/'+training_set+'_'+ date.today().strftime("%Y-%m-%d")+'_'+datetime.now().strftime("%H-%M")+'.csv', index = False)
+# liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+df2/liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+oreder+'_'+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.7846          
+df['m_measured'].iloc[-1]= 0.7826
 
-df['time'].iloc[-1]= 141.2942
+
+         
+
+df['time'].iloc[-1]= 63.0953
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
