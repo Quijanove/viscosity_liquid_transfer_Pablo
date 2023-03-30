@@ -219,13 +219,13 @@ liq = Dispense()
 liq.name = 'Viscosity_std_1275'
 liq.density = 0.8736
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
-model = 'gpr'
+model = 'lin'
 training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
 penalization = 'none' #or 'multiply'
-oredr = 'unordered' # or ''
+order = 'unordered' # or ''
 
 
 #Dont change 
@@ -290,7 +290,7 @@ if training_set == '1' and len(liq.df)==1:
     df['aspiration_rate'].iloc[-1] = df['aspiration_rate'].iloc[0]/2
     df['dispense_rate'].iloc[-1] = df['dispense_rate'].iloc[0]/2
     for col in list(df.columns[5:11]):
-            print('{}\t: {}'.format(col, liq.df.loc[0,col]))
+            print('{}\t: {}'.format(col, df.loc[1,col]))
 else:
     liq.calibrate(1000) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
 
@@ -305,15 +305,12 @@ else:
     df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
     counter +=1 
-    liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+df2/liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+oreder+'_'+'.csv', index = False)
+    liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/df2/'+liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+order+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.
+df['m_measured'].iloc[-1]= 0.8123          
 
-
-         
-
-df['time'].iloc[-1]= 63.0953
+df['time'].iloc[-1]= 245.4162
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
