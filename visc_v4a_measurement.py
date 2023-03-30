@@ -268,8 +268,7 @@ liq.blowout_delay_min = 0
 
 
 
-
-    #%%
+#%%
 folder = './Opentrons_experiments'
 today = date.today().strftime("%Y-%m-%d")
 subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
@@ -306,10 +305,10 @@ else:
     df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
     counter +=1 
-    #liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+df2/liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+oreder+'_'+'.csv', index = False)
+    liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/'+df2/liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+oreder+'_'+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.7826
+df['m_measured'].iloc[-1]= 0.
 
 
          
