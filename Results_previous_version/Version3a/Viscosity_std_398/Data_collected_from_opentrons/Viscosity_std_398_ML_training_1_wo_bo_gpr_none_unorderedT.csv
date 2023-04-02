@@ -1,4 +1,4 @@
-liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out_rate,delay_aspirate,delay_dispense,delay_blow_out,touch_tip_aspirate,touch_tip_dispense,density,time,mi,mf,m,error,Transfer_Observation,Comment
+liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out_rate,delay_aspirate,delay_dispense,delay_blow_out,touch_tip_aspirate,touch_tip_dispense,density,time,mi,mf,m,%error,Transfer_Observation,Comment
 Viscosity_std_398,p1000,1000.0,34.6,47.3,0,4.3,2.9,0,True,False,0.8672,62.781198263168335,21.335,22.193,0.8580000000000005,-1.060885608856023,Within tolerance of 1000uL,
 Viscosity_std_398,p1000,1000.0,34.6,47.3,0,4.3,2.9,0,True,False,0.8672,62.80989217758179,22.193,23.0508,0.8577999999999975,-1.083948339483685,Within tolerance of 1000uL,
 Viscosity_std_398,p1000,1000.0,34.6,47.3,0,4.3,2.9,0,True,False,0.8672,62.84566521644592,23.0508,23.9097,0.858900000000002,-0.9571033210329769,Within tolerance of 1000uL,
