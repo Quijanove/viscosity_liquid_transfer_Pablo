@@ -15,9 +15,9 @@ import os #os is a package that let's you get paths of files in different folder
 # from the files generated in the Opentron's jupyter notebook and in the visc_vx_measurement.py
 # given a specific viscous liquid name and a model
 
-liquid_name = 'Viscosity_std_1275'
+liquid_name = 'Viscosity_std_398'
 version = 'wo_bo'
-data_train = 'full'
+data_train = '1'
 
 viscous_liquid_cal_folder = '../Std_calibrations'
 viscous_liquid_exp_folder = '../Opentrons_experiments/'+liquid_name + '/Data_collected_from_opentrons' 
@@ -39,7 +39,7 @@ for name in os.listdir(viscous_liquid_exp_folder):
 #%%
 df_cal = pd.read_csv(viscous_liquid_cal_folder+'/'+liquid_name+'.csv')
 
-if data_train == 'full': 
+if data_train == 'half': 
 
     for experiment in file_dict[liquid_name]['Experiment']:
     
@@ -177,7 +177,7 @@ if data_train == '1':
         fig.suptitle('{} model with {}  penalization, \n trained with {} initialization data and {} by time'.format(model,penalization,data_train,order))
         fig.legend(loc=7)
         fig.tight_layout()
-        #fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
+        fig.savefig(viscous_liquid_exp_folder+r'/'+experiment+'.png')
 
 # %%
 #%%
