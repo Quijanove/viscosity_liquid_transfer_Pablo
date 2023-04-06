@@ -136,7 +136,7 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()*(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
+            out = pred.item()/(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             #deleted from above: /(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             return out #pred.item()
@@ -220,7 +220,7 @@ training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
-penalization = 'multiply' #or 'multiply'
+penalization = 'divide' #or 'multiply'
 order = 'unordered' # or ''
 
 
@@ -298,15 +298,16 @@ else:
     df.loc[:,'blow_out_rate'].iloc[-1] = 0
     df.loc[:,'delay_blow_out'].iloc[-1] = 0
 
+
     df['m_expected'].iloc[-1]=df['volume'].iloc[-1]/1000 * liq.density
 
     counter +=1 
     liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/df2/'+liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+order+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.9022     
+df['m_measured'].iloc[-1]= 0.8999      
 
-df['time'].iloc[-1]= 1356.8108
+df['time'].iloc[-1]= 479.6427
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
