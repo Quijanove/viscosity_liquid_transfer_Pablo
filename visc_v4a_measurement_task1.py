@@ -136,7 +136,7 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()/(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
+            out = pred.item()
             #deleted from above: /(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             return out #pred.item()
@@ -212,15 +212,15 @@ class Dispense:
 liq = Dispense()
 
 #Please enter name, density, csv with calibration data for training and model name
-liq.name = 'Viscosity_std_1275'
-liq.density = 0.8736
+liq.name = 'Viscosity_std_398'
+liq.density = 0.8672
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
 model = 'lin'
 training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
-penalization = 'divide' #or 'multiply'
+penalization = 'none' #or 'multiply'
 order = 'unordered' # or ''
 
 
@@ -288,7 +288,7 @@ if training_set == '1' and len(liq.df)==1:
     for col in list(df.columns[5:11]):
             print('{}\t: {}'.format(col, df.loc[1,col]))
 else:
-    liq.calibrate(1000) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
+    liq.calibrate(1000, model_kind=model) ## input volume, when blank it will chose a value between 100 - 1000 uL, 
 
     df = df.append(liq.out_df2.iloc[0,0:-2],ignore_index=True)
     df.iloc[-1,0:5] = df.iloc[0,0:5]
@@ -305,9 +305,9 @@ else:
     liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/df2/'+liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+order+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.8999      
+df['m_measured'].iloc[-1]= 0.8715                        
 
-df['time'].iloc[-1]= 479.6427
+df['time'].iloc[-1]= 68.0008
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
