@@ -15,7 +15,7 @@ import os #os is a package that let's you get paths of files in different folder
 # from the files generated in the Opentron's jupyter notebook and in the visc_vx_measurement.py
 # given a specific viscous liquid name and a model
 
-liquid_name = 'Viscosity_std_398'
+liquid_name = 'Viscosity_std_1275'
 version = 'wo_bo'
 data_train = '1'
 
