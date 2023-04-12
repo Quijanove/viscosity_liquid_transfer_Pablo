@@ -212,8 +212,8 @@ class Dispense:
 liq = Dispense()
 
 #Please enter name, density, csv with calibration data for training and model name
-liq.name = 'Viscosity_std_398'
-liq.density = 0.8672
+liq.name = 'Viscosity_std_817'
+liq.density = 0.8466
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
 model = 'lin'
 training_set_list = ['full', 'half','4','1']
@@ -305,9 +305,9 @@ else:
     liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/df2/'+liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+order+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.8715                        
+df['m_measured'].iloc[-1]= 0.8483                                             
 
-df['time'].iloc[-1]= 68.0008
+df['time'].iloc[-1]= 229.0202
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
