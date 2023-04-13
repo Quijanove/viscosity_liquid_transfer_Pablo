@@ -136,7 +136,7 @@ class Dispense:
             pred = self.model.predict(X)
             
             ## scalarization:
-            out = pred.item()
+            out = pred.item()*(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             #deleted from above: /(1/input_array['aspiration_rate'] + 1/input_array['dispense_rate'])
             
             return out #pred.item()
@@ -212,15 +212,15 @@ class Dispense:
 liq = Dispense()
 
 #Please enter name, density, csv with calibration data for training and model name
-liq.name = 'Viscosity_std_817'
-liq.density = 0.8466
+liq.name = 'Viscosity_std_1275'
+liq.density = 0.8736
 file_name = 'Std_calibrations/{}.csv'.format(liq.name)
 model = 'lin'
 training_set_list = ['full', 'half','4','1']
 training_set = training_set_list[3]
 features_list = ['wo_bo', 'wbo']
 feature_selection = features_list[0]
-penalization = 'none' #or 'multiply'
+penalization = 'multiply' #or 'multiply'
 order = 'unordered' # or ''
 
 
@@ -305,9 +305,9 @@ else:
     liq.out_df2.to_csv(folder+'/'+liq.name.split('.')[0]+'/'+model+'/df2/'+liq.name.split('.')[0]+'_training_'+training_set+'_'+feature_selection+'_'+model+'_'+penalization+'_'+order+'_'+str(counter)+'.csv', index = False)
 
 #%%
-df['m_measured'].iloc[-1]= 0.8483                                             
+df['m_measured'].iloc[-1]= 0.8744               
 
-df['time'].iloc[-1]= 229.0202
+df['time'].iloc[-1]= 401.311
 
 df[r'%error'].iloc[-1]= (df['m_measured'].iloc[-1]- df['m_expected'].iloc[-1])/df['m_expected'].iloc[-1] *100
 df.to_csv('current_experiment.csv', index=False)
