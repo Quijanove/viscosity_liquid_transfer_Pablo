@@ -86,7 +86,17 @@ def analyze_scores(grid_search,data,features,target):
     """
     #scale features 
     scaler = StandardScaler()
-    df_scaled = data.copy()
+    df_scaled = data.where(data['volume']==1000).dropna(how='all').copy()
+    unique_index = df_scaled[features].drop_duplicates().index
+    if len(unique_index) < 4:
+        return None
+    
+    else:
+
+    df_scaled = df_scaled.loc[unique_index]
+
+    
+
     df_scaled[features] = scaler.fit_transform(df_scaled[features])
     X = df_scaled[features]
     y = df_scaled[target]
@@ -129,9 +139,9 @@ def analyze_predictions_list_datasets(model, features,target,dir_name,model_name
             all_predictions_df = pd.concat([all_predictions_df,prediction_df], ignore_index= True)
     #Save aggregated dataframe
     if i != None:
-        all_predictions_df.to_csv(model_name+'_'+i+'.csv',index=False)
+        all_predictions_df.to_csv(model_name+'_'+i+'_abs.csv',index=False)
     else:
-        all_predictions_df.to_csv(model_name+'.csv',index=False)
+        all_predictions_df.to_csv(model_name+'_abs.csv',index=False)
     return all_predictions_df
 
 
@@ -148,10 +158,12 @@ def analyze_predictions(model, data,features,target):
     """
     #scale features 
     scaler = StandardScaler()
-    df_scaled = data.copy()
+    df_scaled = data.where(data['volume']==1000).dropna(how='all').copy()
+    unique_index = df_scaled[features].drop_duplicates().index
+    df_scaled = df_scaled.loc[unique_index]    
     df_scaled[features] = scaler.fit_transform(df_scaled[features])
     X = df_scaled[features]
-    y = df_scaled[target]
+    y = abs(df_scaled[target])
 
     #split train/test sets and train model
     X_train, X_test, y_train, y_test = train_test_split(X,y,random_state=42)     
@@ -244,10 +256,11 @@ for model_name in model_list:
         grid ={}
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
     elif model_name =='gpr':
         matern_tunable = ConstantKernel(1.0, (1e-5, 1e6)) * Matern(
-                        length_scale=1.0, length_scale_bounds=(1e-5, 1e6), nu=2.5)
+                        length_scale=1.0, length_scale_bounds=(1e-6, 1e6), nu=2.5)
 
         model = GaussianProcessRegressor(kernel=matern_tunable, normalize_y=True)
         alpha= np.arange(0.1,1.1,0.1)
@@ -256,6 +269,7 @@ for model_name in model_list:
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
 
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
 
   
@@ -265,6 +279,7 @@ for model_name in model_list:
         grid ={}
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
     elif model_name == 'SVR':
         for i in ['linear','rbf','sigmoid','poly']:
@@ -275,7 +290,8 @@ for model_name in model_list:
                 grid = dict(C=C,epsilon=epsilon)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
-            
+                df_out.to_csv('model_parameters_train.csv', index=False)
+
             elif i == 'rbf':
                 model =  SVR(kernel=i)
                 C = np.arange(1,110,10)
@@ -284,7 +300,8 @@ for model_name in model_list:
                 grid = dict(C=C,epsilon=epsilon, gamma=gamma)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
-            
+                df_out.to_csv('model_parameters_train.csv', index=False)
+
             
             elif i == 'poly':
                 model =  SVR(kernel=i)
@@ -296,6 +313,7 @@ for model_name in model_list:
                 grid = dict(C=C,epsilon=epsilon, gamma=gamma, degree= degree, coef0=coef0)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
+                df_out.to_csv('model_parameters_train.csv', index=False)
 
             else:
                 model =  SVR(kernel=i)
@@ -306,6 +324,7 @@ for model_name in model_list:
                 grid = dict(C=C,epsilon=epsilon, gamma=gamma,coef0=coef0)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
+                df_out.to_csv('model_parameters_train.csv', index=False)
 
 
     elif model_name == 'SGD':
@@ -320,7 +339,8 @@ for model_name in model_list:
                             learning_rate=learning_rate, power_t =power_t)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
-            
+                df_out.to_csv('model_parameters_train.csv', index=False)
+
             if i == 'elasticnet':
                 model = linear_model.SGDRegressor(random_state=42, penalty=i)
                 alpha = np.arange(0.0001,0.0011,0.0001)
@@ -331,10 +351,11 @@ for model_name in model_list:
                             learning_rate=learning_rate, power_t =power_t)                
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
+                df_out.to_csv('model_parameters_train.csv', index=False)
 
     elif model_name == 'KNR':
         model =  KNeighborsRegressor()
-        n_neighbors = range(1,11,1)
+        n_neighbors = range(1,6,1)
         weights= ['uniform','distance']
         algorithm = ['auto', 'ball_tree', 'kd_tree', 'brute']
         leaf_size = range(1,110,10)
@@ -343,6 +364,7 @@ for model_name in model_list:
                     leaf_size=leaf_size, p=p)
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
 
 
@@ -353,6 +375,7 @@ for model_name in model_list:
         grid = dict(criterion=criterion, splitter = splitter)
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
 
     elif model_name == 'KR':
@@ -364,7 +387,8 @@ for model_name in model_list:
                 grid = dict (alpha=alpha, kernel=kernel)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
-        
+                df_out.to_csv('model_parameters_train.csv', index=False)
+       
             elif i ==  'polynomial':
                 kernel =['polynomial']
                 degree = range(1,4,1)
@@ -372,6 +396,7 @@ for model_name in model_list:
                 grid = dict (alpha=alpha, kernel=kernel, degree=degree,coef0=coef0)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
+                df_out.to_csv('model_parameters_train.csv', index=False)
 
             else:
                 kernel = ['sigmoid']
@@ -379,6 +404,7 @@ for model_name in model_list:
                 grid = dict (alpha=alpha, kernel=kernel, degree=degree,coef0=coef0)
                 search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
+                df_out.to_csv('model_parameters_train.csv', index=False)
 
     
     elif model_name == 'PLSR':
@@ -387,6 +413,7 @@ for model_name in model_list:
         grid = dict(n_components=n_components)
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
     elif model_name == 'RFR':
         model =  RandomForestRegressor(random_state=42)
@@ -394,6 +421,7 @@ for model_name in model_list:
         grid = dict(criterion=criterion)
         search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
         df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+        df_out.to_csv('model_parameters_train.csv', index=False)
 
 df_out.to_csv('model_parameters_train.csv', index=False)
 
@@ -424,8 +452,8 @@ for model_name in model_list:
                     length_scale=1.0, length_scale_bounds=(1e-5, 1e6), nu=2.5)
 
         model = GaussianProcessRegressor(kernel=matern_tunable, 
-                                        n_restarts_optimizer=0, 
-                                        alpha=0.3, 
+                                        n_restarts_optimizer=1, 
+                                        alpha=0.2, 
                                         )
         all_predictions_dict[model_name]=analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=None)
 
@@ -439,34 +467,34 @@ for model_name in model_list:
     elif model_name == 'SVR':
         for i in ['linear','rbf','sigmoid','poly']:
             if i == 'linear':
-                model =  SVR(kernel=i,C=51,epsilon=0.3)
+                model =  SVR(kernel=i,C=11,epsilon=0.1)
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
             elif i == 'rbf':
-                model =  SVR(kernel=i, C=31, epsilon=0.5, gamma= 'auto')
+                model =  SVR(kernel=i, C=21, epsilon=0.1, gamma= 'auto')
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
             elif i == 'poly':
-                model =  SVR(kernel=i, C = 41, coef0 = 1, degree = 1, epsilon = 0.2, gamma = 'scale')
+                model =  SVR(kernel=i, C = 21, coef0 = 11, degree = 2, epsilon = 0.1, gamma = 'auto')
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
             else:
-                model =  SVR(kernel=i, C=11, coef0= 0, epsilon = 0.7,gamma= 'auto')
+                model =  SVR(kernel=i, C=11, coef0= 0, epsilon = 1.0,gamma= 'scale')
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
 
     elif model_name == 'SGD':
         for i in ['l2-l1','elasticnet']:
             if i == 'l2-l1':
-                model = linear_model.SGDRegressor(random_state=42, alpha=0.001,learning_rate='constant', penalty= 'l1', power_t = 0.25)
+                model = linear_model.SGDRegressor(random_state=42, alpha=0.008,learning_rate='adaptive', penalty= 'l2', power_t = 0.25)
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
             if i == 'elasticnet':
-                model = linear_model.SGDRegressor(random_state=42, penalty=i,alpha=0.0009,learning_rate='constant', power_t = 0.25, l1_ratio =0.3)
+                model = linear_model.SGDRegressor(random_state=42, penalty=i,alpha=0.001,learning_rate='adaptive', power_t = 0.25, l1_ratio =0.3)
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
 
     elif model_name == 'KNR':
-        model =  KNeighborsRegressor(algorithm= 'brute',leaf_size=1, n_neighbors=4,p=2,weights='uniform')
+        model =  KNeighborsRegressor(algorithm= 'brute',leaf_size=1, n_neighbors=2,p=2,weights='uniform')
         all_predictions_dict[model_name]=analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=None)
 
     elif model_name == 'DTR':
@@ -476,14 +504,14 @@ for model_name in model_list:
     elif model_name == 'KR':
         for i in ['most','polynomial', 'sigmoid']:
             if i == 'most':
-                model =  KernelRidge(kernel='poly',alpha=1.1)
+                model =  KernelRidge(kernel='laplacian',alpha=0.1)
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
                    
             elif i ==  'polynomial':
-                model =  KernelRidge(alpha=0.1, coef0=1,degree=1,kernel='polynomial')
+                model =  KernelRidge(alpha=0.1, coef0=11,degree=2,kernel='polynomial')
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
             else:
-                model =  KernelRidge(alpha=3.1, coef0=1, degree=1, kernel='sigmoid')
+                model =  KernelRidge(alpha=1.1, coef0=1, degree=1, kernel='sigmoid')
                 all_predictions_dict[model_name+'_'+i] = analyze_predictions_list_datasets(model,features,target, dir_name,model_name,i=i)
     
     # elif model_name == 'PLSR':
