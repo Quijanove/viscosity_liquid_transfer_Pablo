@@ -1,0 +1,4 @@
+liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out_rate,delay_aspirate,delay_dispense,delay_blow_out,Time for 1000ul,%error
+Viscosity_std_7782,p1000,1000,6,3,0,5,5,0,510,-34.99886698
+Viscosity_std_7782,p1000,1000,3.3,1.8,0,5.25,4.75,0,868.5858586,-13.16564695
+Viscosity_std_7782,p1000,1000,5.4,3.6,0,2.5,5,0,470.462963,-33.48062542
