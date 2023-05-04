@@ -1,5 +1,4 @@
 liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out_rate,delay_aspirate,delay_dispense,delay_blow_out,touch_tip_aspirate,touch_tip_dispense,density,time,mi,mf,m,%error,Transfer_Observation,Comment
-Viscosity_std_398.4,p1000,1000,55,55,0,0,0,0,TRUE,FALSE,0.8672,42.00240946,20.2202,20.916,0.6958,-19.76476015,Incomplete Dispense,
 Viscosity_std_398,p1000,1000,55,55,0,5,5,0,TRUE,FALSE,0.8672,52.34493327,21.7652,22.5959,0.8307,-4.208948339,incomplete aspiration,
 Viscosity_std_398,p1000,500,55,55,0,5,5,0,TRUE,FALSE,0.8672,33.37725735,22.5959,23.0176,0.4217,-2.744464945,incomplete aspiration,
 Viscosity_std_398,p1000,100,55,55,0,5,5,0,TRUE,FALSE,0.8672,18.80736136,23.0176,23.1067,0.0891,2.744464945,excess aspiration,
