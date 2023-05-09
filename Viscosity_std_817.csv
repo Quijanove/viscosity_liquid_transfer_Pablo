@@ -1,0 +1,47 @@
+liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out,delay_aspirate,delay_dispense,delay_blow_out,density,time,m,%error,Transfer_Observation,Comment
+Viscosity_std_817,rLine1000,1000,54.16311863044341,54.16311863044341,True,10,10,5,0.8466,108.03284955024719,0.723398982279126,-14.552447167596739,Incomplete aspiration and dispense,No comment
+Viscosity_std_817,rLine1000,1000,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,99.88737773895264,0.662127324532606,-21.7898270100867,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,99.9654278755188,0.7530804012635876,-11.046491700497576,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,81.67880821228027,0.37764032195399644,-10.786600058115656,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,81.59392523765564,0.3893846634863852,-8.012127690435822,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,74.42954087257385,0.22215165136823822,-12.531832676494927,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,54.16311863044341,54.16311863044341,False,10,10,0,0.8466,74.27834391593933,0.23477026150105304,-7.563484722791952,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,54.163119,40.0,False,10,10,0,0.8466,106.83449649810791,0.6846397409935748,-19.1306708016094,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,54.163119,40.0,False,10,10,0,0.8466,106.88173079490662,0.8211276406634087,-3.008783290407667,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,54.163119,40.0,False,10,10,0,0.8466,85.12472748756409,0.39397457363862165,-6.927811566590683,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,54.163119,40.0,False,10,10,0,0.8466,85.14770293235779,0.39114777183057753,-7.595612607942943,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,54.163119,40.0,False,10,10,0,0.8466,76.76642632484436,0.22127738276781225,-12.876060017398135,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,54.163119,40.0,False,10,10,0,0.8466,76.5020399093628,0.2254738720498569,-11.223768781062743,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,50.0,40.0,False,10,10,0,0.8466,108.54836940765381,0.6667609481148637,-21.242505538050587,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,50.0,40.0,False,10,10,0,0.8466,108.7259407043457,0.8034382726481232,-5.098243249690154,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,50.0,40.0,False,10,10,0,0.8466,87.26989388465881,0.3863101522415541,-8.738447379741539,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,50.0,40.0,False,10,10,0,0.8466,85.89780616760254,0.3904337858068964,-7.764284004985493,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,50.0,40.0,False,10,10,0,0.8466,76.65307903289795,0.2302677782088593,-9.336255528443477,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,50.0,40.0,False,10,10,0,0.8466,76.7542769908905,0.23360457003381835,-8.022454510662923,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,30.0,40.0,False,10,10,0,0.8466,121.67813396453857,0.6739008083516759,-20.39914855283772,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,30.0,40.0,False,10,10,0,0.8466,121.7365300655365,0.7997954868130152,-5.528527425819143,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,30.0,40.0,False,10,10,0,0.8466,92.71715569496155,0.4010561493020719,-5.254866689801113,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,30.0,40.0,False,10,10,0,0.8466,92.53010272979736,0.40321267851645604,-4.7454102252643455,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,30.0,40.0,False,10,10,0,0.8466,80.89212608337402,0.23886475277971458,-5.951353342895289,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,30.0,40.0,False,10,10,0,0.8466,81.10992527008057,0.23185603283296644,-8.71090919246933,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,30.0,20.0,False,10,10,0,0.8466,146.78364300727844,0.7376204181793884,-12.872617743989089,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,30.0,20.0,False,10,10,0,0.8466,147.02010798454285,0.80737248135004,-4.633536339470823,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,30.0,20.0,False,10,10,0,0.8466,106.54174900054932,0.3964079545764737,-6.352951907282376,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,30.0,20.0,False,10,10,0,0.8466,104.77825450897217,0.4057917708877125,-4.136127831865697,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,30.0,20.0,False,10,10,0,0.8466,88.27859854698181,0.22735354954077275,-10.483679998120833,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,30.0,20.0,False,10,10,0,0.8466,88.27177739143372,0.23204545769639204,-8.636326601940311,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,30.0,15.0,False,10,10,0,0.8466,163.36359167099,0.765349303956232,-9.597294595295063,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,30.0,15.0,False,10,10,0,0.8466,163.41318655014038,0.8120789606489999,-4.077609183912136,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,30.0,15.0,False,10,10,0,0.8466,113.55725073814392,0.39046292809357724,-7.757399458167439,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,30.0,15.0,False,10,10,0,0.8466,113.57077836990356,0.40507778486403134,-4.30479922890826,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,30.0,15.0,False,10,10,0,0.8466,93.56086587905884,0.24180812373448204,-4.792454628521141,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,30.0,15.0,False,10,10,0,0.8466,93.62169456481934,0.24274067690826973,-4.425278798224394,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,20.0,15.0,False,10,10,0,0.8466,181.65189337730408,0.7726785890564696,-8.73156283292351,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,1000,20.0,15.0,False,10,10,0,0.8466,179.99374198913574,0.823400739024516,-2.7402859645031854,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,20.0,15.0,False,10,10,0,0.8466,121.70340371131897,0.40564605945430826,-4.170550565956,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,500,20.0,15.0,False,10,10,0,0.8466,121.70298290252686,0.4080794403921605,-3.595690906647655,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,20.0,15.0,False,10,10,0,0.8466,98.32765007019043,0.23915617564652328,-5.836610895927538,Incomplete aspiration and dispense,Blowout before
+Viscosity_std_817,rLine1000,300,20.0,15.0,False,10,10,0,0.8466,98.43529963493347,0.23385227947060577,-7.924923430740321,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,1000,20.0,15.0,False,10,10,0,0.8466,180.131840467453,0.7810278541905376,-7.745351501235821,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,500,20.0,15.0,False,10,10,0,0.8466,121.7861738204956,0.40545663459088255,-4.2153001202734375,Incomplete aspiration and dispense,No blowout before
+Viscosity_std_817,rLine1000,300,20.0,15.0,False,10,10,0,0.8466,98.45824146270752,0.24735972934718695,-2.606611013785768,,
