@@ -1,0 +1,13 @@
+liquid,pipette,volume,aspiration_rate,dispense_rate,blow_out_rate,delay_aspirate,delay_dispense,delay_blow_out,touch_tip_aspirate,touch_tip_dispense,density,time,mi,mf,m,%error,Transfer_Observation,Comment
+Viscosity_std_1275,p1000,1000,22,11,0,5,5,0,TRUE,FALSE,0.8736,153.3711114,21.8357,22.5978,0.7621,-12.76327839,incomplete aspiration,
+Viscosity_std_1275,p1000,500,22,11,0,5,5,0,TRUE,FALSE,0.8736,84.23379731,22.5978,22.9302,0.3324,-23.9010989,incomplete aspiration,
+Viscosity_std_1275,p1000,100,22,11,0,5,5,0,TRUE,FALSE,0.8736,29.61828828,22.9302,22.9826,0.0524,-40.01831502,incomplete aspiration,
+Viscosity_std_1275,p1000,1000,15.4,11,0,5,5,0,TRUE,FALSE,0.8736,173.8512194,22.9826,23.7682,0.7856,-10.07326007,incomplete aspiration,
+Viscosity_std_1275,p1000,500,15.4,11,0,5,5,0,TRUE,FALSE,0.8736,95.07619834,23.7682,24.1151,0.3469,-20.58150183,incomplete aspiration,
+Viscosity_std_1275,p1000,100,15.4,11,0,5,5,0,TRUE,FALSE,0.8736,32.18052125,24.1151,24.1676,0.0525,-39.90384615,incomplete aspiration,
+Viscosity_std_1275,p1000,1000,19.8,13.75,0,5,5,0,TRUE,FALSE,0.8736,139.799583,24.1676,24.9241,0.7565,-13.40430403,incomplete aspiration,
+Viscosity_std_1275,p1000,500,19.8,13.75,0,5,5,0,TRUE,FALSE,0.8736,77.90342045,24.9241,25.2517,0.3276,-25,incomplete aspiration,
+Viscosity_std_1275,p1000,100,19.8,13.75,0,5,5,0,TRUE,FALSE,0.8736,28.4721458,25.2517,25.2929,0.0412,-52.83882784,incomplete aspiration,
+Viscosity_std_1275,p1000,1000,12.1,13.2,0,5,5,0,TRUE,FALSE,0.8736,179.1250663,25.2929,26.089,0.7961,-8.871336996,incomplete aspiration,
+Viscosity_std_1275,p1000,500,12.1,13.2,0,5,5,0,TRUE,FALSE,0.8736,97.94113421,26.089,26.4509,0.3619,-17.1474359,incomplete aspiration,
+Viscosity_std_1275,p1000,100,12.1,13.2,0,5,5,0,TRUE,FALSE,0.8736,33.13688254,26.4509,26.5082,0.0573,-34.40934066,incomplete aspiration,
