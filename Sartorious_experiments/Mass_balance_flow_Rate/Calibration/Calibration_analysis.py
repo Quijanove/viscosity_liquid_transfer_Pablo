@@ -19,7 +19,7 @@ for key in files_dict:
     files_dict[key]['ts'] = files_dict[key]['Time'].astype('datetime64[ns]').values.astype('float') / 10 ** 9
     files_dict[key]['ts']=files_dict[key]['ts']-files_dict[key]['ts'][0]
     # files_dict[key]['Mass']=files_dict[key]['Mass']-files_dict[key]['Mass'][0]
-    files_dict[key]['Mass_analysis_smooth']= signal.savgol_filter(files_dict[key]['Mass'],91,1)
+    files_dict[key]['Mass_analysis_smooth']= signal.savgol_filter(files_dict[key]['Mass'],11,1)
     files_dict[key]['Mass_analysis_derivative_smooth']=files_dict[key]['Mass_analysis_smooth'].diff()
     
 #%%Batch Analisisof aspiration curves by mass
@@ -113,4 +113,51 @@ df['Mass_change']=df['Mass']-df['Mass'][0]
 df['Mass_smooth']= signal.savgol_filter(df['Mass_change'],5,1)
 df['Mass_derivative_smooth']=df['Mass_smooth'].diff()
 df.plot(x='ts', y='Mass_derivative_smooth')
+# %%
+from scipy.optimize import curve_fit
+def sigmoid(x, L ,x0, k, b):
+    y = L / (1 + np.exp(-k*(x-x0))) + b
+    return (y)
+
+file = '2023-03-10_16-57_Viscosity_std_505_265_csv'
+
+xdata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['ts']
+ydata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['Mass']
+
+p0 = [max(ydata), np.median(xdata),1,min(ydata)] # this is an mandatory initial guess
+
+popt, pcov = curve_fit(sigmoid, xdata, ydata,p0)
+
+yfit = sigmoid(xdata,popt[0],popt[1],popt[2],popt[3])
+
+fig,axs = plt.subplots(2)
+axs[0].plot(xdata,ydata,color = 'red')
+axs[0].plot(xdata,yfit,color = 'blue')
+axs[1].plot(xdata,yfit.diff(),color = 'green')
+
+# %%
+from scipy.optimize import curve_fit
+def sigmoid(x, L ,x0, k, b):
+    y = L / (1 + np.exp(-k*(x-x0))) + b
+    return (y)
+
+for file in files_dict.keys():
+
+    xdata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['ts']
+    ydata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['Mass']
+
+    p0 = [max(ydata)+30, np.median(xdata),1,min(ydata)] # this is an mandatory initial guess
+    print(p0)
+
+    popt, pcov = curve_fit(sigmoid, xdata, ydata,p0)
+
+    yfit = sigmoid(xdata,popt[0],popt[1],popt[2],popt[3])
+
+    fig,axs = plt.subplots(2)
+    axs[0].plot(xdata,ydata,color = 'red', label=file.split('_265')[0][17:])
+    axs[0].plot(xdata,yfit,color = 'blue', label= 'sigmoid fit')
+    axs[0].legend()
+    axs[1].plot(xdata,yfit.diff(),color = 'green', label= 'fit derivative')
+    axs[1].legend()
+
 # %%
