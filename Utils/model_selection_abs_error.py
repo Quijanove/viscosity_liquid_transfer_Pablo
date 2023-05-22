@@ -88,14 +88,7 @@ def analyze_scores(grid_search,data,features,target):
     scaler = StandardScaler()
     df_scaled = data.where(data['volume']==1000).dropna(how='all').copy()
     unique_index = df_scaled[features].drop_duplicates().index
-    if len(unique_index) < 4:
-        return None
-    
-    else:
-
     df_scaled = df_scaled.loc[unique_index]
-
-    
 
     df_scaled[features] = scaler.fit_transform(df_scaled[features])
     X = df_scaled[features]
@@ -259,8 +252,8 @@ for model_name in model_list:
         df_out.to_csv('model_parameters_train.csv', index=False)
 
     elif model_name =='gpr':
-        matern_tunable = ConstantKernel(1.0, (1e-5, 1e6)) * Matern(
-                        length_scale=1.0, length_scale_bounds=(1e-6, 1e6), nu=2.5)
+        matern_tunable = ConstantKernel(1.0, (1e-12, 1e6)) * Matern(
+                        length_scale=1.0, length_scale_bounds=(1e-12, 1e6), nu=2.5)
 
         model = GaussianProcessRegressor(kernel=matern_tunable, normalize_y=True)
         alpha= np.arange(0.1,1.1,0.1)
@@ -353,18 +346,18 @@ for model_name in model_list:
                 df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name,i=i)],axis=1)
                 df_out.to_csv('model_parameters_train.csv', index=False)
 
-    elif model_name == 'KNR':
-        model =  KNeighborsRegressor()
-        n_neighbors = range(1,6,1)
-        weights= ['uniform','distance']
-        algorithm = ['auto', 'ball_tree', 'kd_tree', 'brute']
-        leaf_size = range(1,110,10)
-        p = range(1,11,1)
-        grid = dict(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm,
-                    leaf_size=leaf_size, p=p)
-        search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
-        df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
-        df_out.to_csv('model_parameters_train.csv', index=False)
+    # elif model_name == 'KNR':
+    #     model =  KNeighborsRegressor()
+    #     n_neighbors = range(1,6,1)
+    #     weights= ['uniform','distance']
+    #     algorithm = ['auto', 'ball_tree', 'kd_tree', 'brute']
+    #     leaf_size = range(1,110,10)
+    #     p = range(1,11,1)
+    #     grid = dict(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm,
+    #                 leaf_size=leaf_size, p=p)
+    #     search = GridSearchCV(model,grid,scoring= 'neg_mean_absolute_error', cv = loo)
+    #     df_out = pd.concat([df_out,analyze_scores_list_datasets(search,features,target,dir_name,model_name)],axis=1)
+    #     df_out.to_csv('model_parameters_train.csv', index=False)
 
 
 
