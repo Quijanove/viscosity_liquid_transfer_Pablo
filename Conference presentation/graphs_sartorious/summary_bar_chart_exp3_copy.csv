@@ -1,0 +1,9 @@
+﻿Viscosity,Absolute Error to transfer 1000 μL [%],Absolute Error to transfer 500 μL [%],Absolute Error to transfer 300 μL [%],Time to aspirate 1000 μL [s],Iteration for best parameter,Driver
+204,-0.4,-1.5,-2.6,93,6,Human
+204,-2,-0.9,-2.1,95,10,ML
+505,-1,-1.6,-3.5,240,6,Human
+505,-1.6,-1.8,-2,180,10,ML
+817,-2.8,-3.8,-4,320,15,Human
+817,-0.6,-2,-3.2,206,9,ML
+1275,-2.5,-3.8,-2.4,670,9,Human
+1275,-2.8,-4,-6,420,9,ML
