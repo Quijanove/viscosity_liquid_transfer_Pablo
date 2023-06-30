@@ -1,0 +1,9 @@
+﻿Viscosity,Volume transferred for 1000 μL [μL] ,Error to transfer 1000 μL [μL], Error to transfer 1000 μL [%],Standard deviation  1000 μL [μL],Relative standard deviation  1000 μL [%],Volume transferred for 500 μL [μL] ,Error to transfer 500 μL [μL],Error to transfer 500 μL [%],Standard deviation  500 μL [μL],Relative standard deviation  500 μL [%],Volume transferred for 300 μL [μL] ,Error to transfer 300 μL [μL],Error to transfer 300 μL [%],Standard deviation  300 μL [μL],Relative standard deviation  300 μL [%],Time to aspirate 1000 μL [s],Iteration for best parameter,Driver
+204,290.9421657,,-1.005019089,3.478034545,1.19543846,485.6110741,,6.465325033,1.331379241,-2.877785178,989.9498091,,4.585309015,0.463186009,-1.005019089,93,6,Human
+204,,,-2,,,,,-0.9,,,,,-2.1,,,95,10,ML
+505,980.2286527,,9.464137747,0.965503071,-1.97713473,486.3788242,,7.562846193,1.554929166,-2.72423516,284.9352427,,4.271585961,1.499142725,-5.021585767,240,6,Human
+505,,,-1.6,,,,,-1.8,,,,,-2,,,180,10,ML
+817,,,-2.8,,,,,-3.8,,,,,-4,,,320,15,Human
+817,,,-0.6,,,,,-2,,,,,-3.2,,,206,9,ML
+1275,,,-2.5,,,,,-3.8,,,,,-2.4,,,670,9,Human
+1275,,,-2.8,,,,,-4,,,,,-6,,,420,9,ML
