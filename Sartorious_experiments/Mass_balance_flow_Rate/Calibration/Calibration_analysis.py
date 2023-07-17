@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import os
 import regex as re
 from sklearn.linear_model import LinearRegression
+import matplotlib.animation as animation
 SMALL_SIZE = 16
 MEDIUM_SIZE = 18
 BIGGER_SIZE = 20
@@ -121,7 +122,77 @@ for key in files_dict:
 
 
 # %%Batch Analisis of aspiration curves stoppped by derivative
+key =  '2023-03-10_16-19_Viscosity_std_1275_265_csv'
+fig, axs = plt.subplots(2,1,figsize= (8,10), sharex=True)
+axs[0].yaxis.set_tick_params(labelleft=False)
+axs[1].plot(np.arange(0,90,1),[-0.05]*90)
 
+line, = axs[0].plot(files_dict[key]['ts'][:], files_dict[key]['Mass_smooth'][:],linewidth=5)
+
+line2, = axs[1].plot(files_dict[key]['ts'], files_dict[key]['Mass_derivative_smooth'],linewidth=5)
+
+
+def animate(i):
+    line.set_ydata(files_dict[key]['Mass_smooth'][:350+i])
+    line.set_xdata(files_dict[key]['ts'][:350+i])
+    line2.set_ydata(files_dict[key]['Mass_derivative_smooth'][:350+i])
+    line2.set_xdata(files_dict[key]['ts'][:350+i])
+    return line,line2,
+ani = animation.FuncAnimation(
+    fig, animate, frames= 350,interval=20, blit=True)
+
+plt.show()
+
+#%%
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+fig, ax = plt.subplots()
+
+x = np.arange(0, 2*np.pi, 0.01)
+line, = ax.plot(x, np.sin(x))
+
+
+def animate(i):
+    line.set_ydata(np.sin(x + i / 50))  # update the data.
+    return line,
+
+
+ani = animation.FuncAnimation(
+    fig, animate, interval=20, blit=True)
+plt.show()
+#%%
+# axs[0].plot(df['ts'],df['Mass_analysis_smooth'],linewidth=16,label = 'Flow_rate = '+key)
+# axs[0].plot(files_dict[key]['ts'], files_dict[key]['Mass_smooth'],label = 'Flow_rate = '+key+' m=')#+str(slope_dict_1[key][0]))
+axs[0].plot(files_dict[key]['ts'], files_dict[key]['Mass_smooth'],linewidth=8,label='Processed data', color = 'green')
+axs[0].plot(files_dict[key]['ts'], files_dict[key]['Mass'],label = 'Experimental data', color= 'orange')
+# axs[0].plot(X,y_hat, color='red')
+axs[0].legend()
+axs[1].set_xlabel('Time [s]')
+axs[0].set_ylabel('Mass [g]')
+axs[1].set_ylabel('dM/dt [g/s]')
+axs[0].set_xbound(5)
+max_y = files_dict[key].where(files_dict[key]['ts']>5).dropna()['Mass'].max()+100
+min_y = files_dict[key].where(files_dict[key]['ts']>5).dropna()['Mass'].min()-100
+axs[0].set_ybound(min_y,max_y)
+
+
+# axs[1].scatter(df['ts'],df['Mass_analysis_derivative_smooth'],linewidth=10, color='blue')
+axs[1].plot(files_dict[key]['ts'], files_dict[key]['Mass'].diff(),color='orange')
+axs[1].plot(files_dict[key]['ts'], files_dict[key]['Mass_derivative_smooth'],linewidth=5, color='green')
+max_y = files_dict[key].where(files_dict[key]['ts']>5).dropna(how='all')['Mass_analysis_derivative_smooth'].max()*1.1
+min_y = files_dict[key].where(files_dict[key]['ts']>5).dropna(how='all')['Mass_analysis_derivative_smooth'].min()*1.1
+axs[1].set_xbound(5)
+axs[1].set_ybound(min_y,max_y)
+axs[0].yaxis.set_tick_params(labelleft=False)
+axs[1].yaxis.set_tick_params(labelleft=False)
+
+fig.tight_layout()
+# counter+=1
+# if counter ==1:
+#     break
+# plt.savefig(folder_name+r'/'+key+'.png')
 
 
 # %%
