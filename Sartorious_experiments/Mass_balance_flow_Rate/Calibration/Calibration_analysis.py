@@ -228,29 +228,33 @@ axs[1].plot(xdata,yfit.diff(),color = 'green')
 
 # %%
 from scipy.optimize import curve_fit
-def sigmoid(x, L ,x0, k, b):
-    y = L / (1 + np.exp(-k*(x-x0))) + b
-    return (y)
+from scipy.optimize import curve_fit
+def sigmoid(x, L ,x0, k,p,b):
+    y = L / (1 + np.exp(k*(x-x0)))**(1/p) + b
+    return y
 
 for file in files_dict.keys():
 
-    xdata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['ts']
-    ydata = files_dict[file].where(files_dict[file]['ts']>15).dropna()['Mass']
+    xdata = files_dict[file].where(files_dict[file]['ts']>10).dropna()['ts']
+    ydata = files_dict[file].where(files_dict[file]['ts']>10).dropna()['Mass']
 
-    p0 = [max(ydata)+30, np.median(xdata),1,min(ydata)] # this is an mandatory initial guess
+    p0 = [max(ydata)+30, np.median(xdata),1,0.1,min(ydata)] # this is an mandatory initial guess
+    # p0 = [min(ydata),np.median(xdata),1,1,max(ydata)]
     print(p0)
 
     popt, pcov = curve_fit(sigmoid, xdata, ydata,p0)
 
-    yfit = sigmoid(xdata,popt[0],popt[1],popt[2],popt[3])
+    yfit = sigmoid(xdata,popt[0],popt[1],popt[2],popt[3],popt[4])
     
     print('k='+str(popt[2]))
+    dm_dt = yfit.diff()/xdata.diff()
+    print('Std {} mean {} meadian{}'.format(file, np.mean(dm_dt[dm_dt<-2]), np.median(dm_dt[dm_dt<-2])))
 
     fig,axs = plt.subplots(2)
     axs[0].plot(xdata,ydata,color = 'red', label='Experimental data'+file)
     axs[0].plot(xdata,yfit,color = 'blue', label= 'Sigmoid fit')
     axs[0].legend()
-    axs[1].plot(xdata,yfit.diff(),color = 'green', label= 'fit derivative')
+    axs[1].plot(xdata,yfit.diff()/xdata.diff(),color = 'green', label= 'fit derivative')
     axs[1].legend()
 
     axs[1].set_xlabel('Time [s]')
@@ -261,7 +265,7 @@ for file in files_dict.keys():
 
     fig.tight_layout()
 
-    plt.savefig(folder_name+r'/'+file.split('_265')[0][17:]+'_sigmoid.png')
+    # plt.savefig(folder_name+r'/'+file.split('_265')[0][17:]+'_sigmoid.png')
 
 
 # %%
